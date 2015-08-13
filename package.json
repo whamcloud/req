@@ -1,0 +1,37 @@
+{
+  "name": "req",
+  "version": "1.0.0",
+  "description": "A module used to make a request and apply a json mask if necessary.",
+  "main": "index.js",
+  "scripts": {
+    "test": "JASMINE_CONFIG_PATH=jasmine.json NODE_ENV=test jasmine",
+    "jshint": "jshint --c ./.jshintrc --exclude-path ./.jshintignore .",
+    "jscs": "jscs ."
+  },
+  "pre-commit": [
+    "jscs",
+    "jshint",
+    "test"
+  ],
+  "author": "IML Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/intel-js/req.git"
+  },
+  "dependencies": {
+    "highland": "2.5.1",
+    "json-mask": "0.3.4",
+    "through": "file://../through",
+    "lodash-mixins": "file://../../isomorphic/lodash-mixins"
+  },
+  "devDependencies": {
+    "jasmine": "2.3.1",
+    "jasmine-n-matchers": "2.0.2",
+    "jscs": "2.1.0",
+    "jshint": "2.8.0",
+    "krusty-jasmine-reporter": "1.0.0",
+    "pre-commit": "1.1.1",
+    "rewire": "2.3.4"
+  }
+}
