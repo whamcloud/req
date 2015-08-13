@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2014 Intel Corporation All Rights Reserved.
+// Copyright 2013-2015 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -21,17 +21,18 @@
 
 'use strict';
 
-var _ = require('lodash-mixins');
+var obj = require('@intel-js/obj');
 var λ = require('highland');
+var fp = require('@intel-js/fp');
 var requestStream = require('./request-stream');
 var errorBuffer = require('./error-buffer');
 var addRequestInfo = require('./add-request-info');
 var buildOptions = require('./build-options');
 var jsonMask = require('./mask');
-var through = require('through');
+var through = require('@intel-js/through');
 
-module.exports = _.curry(function makeRequest (path, options) {
-  options = _.cloneDeep(options);
+module.exports = fp.curry(3, function bufferRequest (transport, agent, options) {
+  options = obj.clone(options);
 
   var mask;
   if (typeof options.jsonMask === 'string') {
@@ -39,14 +40,14 @@ module.exports = _.curry(function makeRequest (path, options) {
     delete options.jsonMask;
   }
 
-  var reqOptions = buildOptions(path, options);
+  var reqOptions = buildOptions(options);
 
   var buffer;
 
   if (options.json)
     buffer = new Buffer(JSON.stringify(options.json));
 
-  var s = requestStream(reqOptions, buffer);
+  var s = requestStream(transport, agent, reqOptions, buffer);
   return λ(s)
     .through(errorBuffer)
     .through(through.bufferString)
@@ -60,5 +61,5 @@ module.exports = _.curry(function makeRequest (path, options) {
         };
       });
     })
-    .errors(addRequestInfo(path, reqOptions));
+    .errors(addRequestInfo(reqOptions));
 });

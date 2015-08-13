@@ -1,17 +1,18 @@
 'use strict';
 var rewire = require('rewire');
 var bufferRequest = rewire('../buffer-request');
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
 
-describe('api test', function () {
-  var path, options, errorBuffer, λ,
+describe('buffer request', function () {
+  var options, errorBuffer, λ,
     requestStream, stream,
     revert, requestResult, response,
     addRequestInfo, addRequestInfoStream, buildOptions, opts, mask, through;
 
   beforeEach(function () {
-    path = 'test/path';
-    options = {};
+    options = {
+      path: 'test/path'
+    };
     opts = {};
     requestResult = ['{"result": "result"}'];
 
@@ -34,7 +35,7 @@ describe('api test', function () {
       return stream;
     });
 
-    stream.errors.and.callFake(_.fidentity(stream));
+    stream.errors.and.callFake(fp.always(stream));
 
     λ = jasmine.createSpy('highland').and.returnValue(stream);
     requestStream = jasmine.createSpy('requestStream').and.returnValue(requestResult);
@@ -69,18 +70,20 @@ describe('api test', function () {
     beforeEach(function () {
       options = {
         json: { foo: 'bar' },
-        jsonMask: 'p/a,z'
+        jsonMask: 'p/a,z',
+        path: 'test/path'
       };
 
-      bufferRequest(path, options);
+      bufferRequest({}, {}, options);
     });
 
     it('should build a buffer from JSON', function () {
-      expect(requestStream.calls.mostRecent().args[1].toString()).toEqual('{"foo":"bar"}');
+      expect(requestStream.calls.mostRecent().args[3].toString()).toEqual('{"foo":"bar"}');
     });
 
     it('should not include the jsonMask in the options', function () {
-      expect(buildOptions).toHaveBeenCalledOnceWith(path, {
+      expect(buildOptions).toHaveBeenCalledOnceWith({
+        path: 'test/path',
         json: { foo: 'bar' }
       });
     });
@@ -92,15 +95,15 @@ describe('api test', function () {
 
   describe('without json', function () {
     beforeEach(function () {
-      bufferRequest(path, options);
+      bufferRequest({}, {}, options);
     });
 
     it('should call buildOptions with path and options', function () {
-      expect(buildOptions).toHaveBeenCalledOnceWith(path, options);
+      expect(buildOptions).toHaveBeenCalledOnceWith(options);
     });
 
     it('should call request with options and buffer', function () {
-      expect(requestStream).toHaveBeenCalledOnceWith(opts, undefined);
+      expect(requestStream).toHaveBeenCalledOnceWith({}, {}, opts, undefined);
     });
 
     it('should call highland with the result of request', function () {
@@ -126,8 +129,8 @@ describe('api test', function () {
       });
     });
 
-    it('should call addRequestInfo with a path and options', function () {
-      expect(addRequestInfo).toHaveBeenCalledOnceWith(path, options);
+    it('should call addRequestInfo with options', function () {
+      expect(addRequestInfo).toHaveBeenCalledOnceWith(opts);
     });
 
     it('should call errors with addRequestInfo', function () {

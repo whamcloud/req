@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2014 Intel Corporation All Rights Reserved.
+// Copyright 2013-2015 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -21,19 +21,14 @@
 
 'use strict';
 
-var Agent = require('https').Agent;
+var fp = require('@intel-js/fp');
 
-module.exports.agent = new Agent({
-  rejectUnauthorized: false,
-  maxSockets: Infinity
-});
-
-module.exports.waitForRequests = function waitForRequests (done) {
+module.exports = fp.curry(2, function waitForRequests (agent, done) {
   var x = setInterval(function waitForRequests () {
-    if (Object.keys(module.exports.agent.sockets).length)
+    if (Object.keys(agent.sockets).length)
       return;
 
     clearInterval(x);
     done();
   }, 10);
-};
+});

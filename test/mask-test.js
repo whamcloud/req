@@ -3,7 +3,7 @@
 var rewire = require('rewire');
 var mask = rewire('../mask');
 var λ = require('highland');
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
 
 describe('through', function () {
   var theMask, jsonMask, revert;
@@ -12,7 +12,7 @@ describe('through', function () {
     jsonMask = jasmine.createSpy('jsonMask');
 
     revert = mask.__set__({
-      jsonMask: jsonMask
+      jsonMask: fp.curry(2, jsonMask)
     });
   });
 
@@ -59,8 +59,8 @@ describe('through', function () {
 
         spy = jasmine.createSpy('spy');
         highlandStream
-          .errors(_.unary(spy))
-          .each(_.noop);
+          .errors(fp.curry(1, spy))
+          .each(fp.noop);
       });
 
       it('should throw an error', function () {

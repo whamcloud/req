@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2014 Intel Corporation All Rights Reserved.
+// Copyright 2013-2015 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -23,33 +23,29 @@
 
 var stringify = require('querystring').stringify;
 var format = require('util').format;
-var _ = require('lodash-mixins');
-var agent = require('./request-agent').agent;
+var obj = require('@intel-js/obj');
 
 var defaults = {
   method: 'GET',
-  agent: agent,
   headers: {
     Connection: 'keep-alive',
     'Transfer-Encoding': 'chunked'
   }
 };
 
-module.exports = function buildOptions (path, options) {
-  path = path
+module.exports = function buildOptions (options) {
+  options.path = options.path
     .replace(/^\/*/, '/')
     .replace(/\/*$/, '/');
 
   var queryString = stringify(options.qs);
   if (queryString)
-    path = format('%s?%s', path, queryString);
+    options.path = format('%s?%s', options.path, queryString);
 
-  var opts =  _.merge({
-    path: path
-  }, defaults, options);
+  var opts = obj.merge({}, defaults, options);
 
   if (options.json)
-    _.merge(opts, {
+    obj.merge(opts, {
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         Accept: 'application/json'

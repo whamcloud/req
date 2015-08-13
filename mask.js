@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2014 Intel Corporation All Rights Reserved.
+// Copyright 2013-2015 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -21,15 +21,16 @@
 
 'use strict';
 
-var jsonMask = require('json-mask');
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
+var jsonMask = fp.curry(2, require('json-mask'));
 var format = require('util').format;
 
-module.exports = _.curry(function toJson (mask, s) {
-  var runMask = (mask ? _.partialRight(jsonMask, mask) : _.identity);
+module.exports = fp.curry(2, function toJson (mask, s) {
+  var runMask = mask ? jsonMask(fp.__, mask) : fp.identity;
+
   return s
     .map(runMask)
-    .tap (function handle (response) {
+    .tap(function handle (response) {
       if (response !== null)
         return;
 

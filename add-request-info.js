@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2014 Intel Corporation All Rights Reserved.
+// Copyright 2013-2015 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -21,11 +21,11 @@
 
 'use strict';
 
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
 var format = require('util').format;
 
-module.exports = _.curry(function addRequestInfo (path, options, err, push) {
-  err.message = format('%s From %s request to %s', err.message, options.method, path);
+module.exports = fp.curry(3, function addRequestInfo (options, err, push) {
+  err.message = format('%s From %s request to %s', err.message, options.method, options.path);
 
   push(err);
 });

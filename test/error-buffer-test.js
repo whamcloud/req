@@ -2,7 +2,7 @@
 
 var λ = require('highland');
 var errorBuffer = require('../error-buffer');
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
 
 describe('error buffer', function () {
   it('should pass through non-errors', function () {
@@ -19,7 +19,7 @@ describe('error buffer', function () {
       .errors(function (err) {
         expect(err).toEqual(new Error('boom!'));
       })
-      .each(_.noop);
+      .each(fp.noop);
   });
 
   it('should buffer bad status codes', function () {
@@ -36,7 +36,7 @@ describe('error buffer', function () {
       .errors(function (err) {
         expect(err).toEqual(new Error('boom!'));
       })
-      .each(_.noop);
+      .each(fp.noop);
   });
 
   function StreamError (err) {

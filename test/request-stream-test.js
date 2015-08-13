@@ -1,33 +1,29 @@
 'use strict';
 
-var rewire = require('rewire');
-var requestStream = rewire('../request-stream');
+var requestStream = require('../request-stream');
 var PassThrough = require('stream').PassThrough;
 var λ = require('highland');
-var _ = require('lodash-mixins');
+var fp = require('@intel-js/fp');
 
 describe('request', function () {
-  var request, r, s, req, revert, onResponse;
+  var request, r, s, rs, req, onResponse;
   beforeEach(function () {
 
     req = new PassThrough();
     req.setHeader = jasmine.createSpy('setHeader');
     r = new PassThrough();
-    onResponse = _.noop;
+    onResponse = fp.noop;
 
     request = jasmine.createSpy('request').and.callFake(function (options, fn) {
-      process.nextTick(_.flow(_.partial(fn, r), onResponse));
+      var bound = fn.bind(null, r);
+      process.nextTick(fp.flow(bound, onResponse));
 
       return req;
     });
 
-    revert = requestStream.__set__({
+    rs = requestStream({
       request: request
-    });
-  });
-
-  afterEach(function () {
-    revert();
+    }, {});
   });
 
   describe('the request', function () {
@@ -35,7 +31,7 @@ describe('request', function () {
 
     beforeEach(function () {
       buffer = 'buffer';
-      s = requestStream('/api/alert/', buffer);
+      s = rs({ path: '/api/alert/' }, buffer);
     });
 
     it('should call setHeader on the request', function (done) {
@@ -65,7 +61,7 @@ describe('request', function () {
           expect(e).toEqual(err);
           done();
         })
-        .each(_.noop);
+        .each(fp.noop);
 
       req.emit('error', err);
     });
@@ -86,7 +82,7 @@ describe('request', function () {
   describe('the response', function () {
     it('should receive the chunk on the response stream', function (done) {
       var chunk = 'test';
-      s = requestStream('/api/alert/', 'buffer');
+      s = rs({path: '/api/alert/'}, 'buffer');
       r.write(chunk);
       r.headers = {header: 'header'};
       r.end();
@@ -103,13 +99,13 @@ describe('request', function () {
 
     it('should handle error when status code is greater than 400', function (done) {
       r.statusCode = 404;
-      s = requestStream('/api/alert/', 'buffer');
+      s = rs({path: '/api/alert/'}, 'buffer');
       λ(s)
         .errors(function (e) {
           expect(e.statusCode).toEqual(404);
           done();
         })
-        .each(_.noop);
+        .each(fp.noop);
     });
 
     describe('passthrough error', function () {
@@ -127,7 +123,7 @@ describe('request', function () {
           });
         };
 
-        s = requestStream('/api/alert/', 'buffer');
+        s = rs({path: '/api/alert/'}, 'buffer');
 
         λ(s)
           .errors(function (e) {
