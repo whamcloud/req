@@ -32,7 +32,7 @@ var jsonMask = require('./mask');
 var through = require('@intel-js/through');
 
 module.exports = fp.curry(3, function bufferRequest (transport, agent, options) {
-  options = obj.clone(options);
+  options = obj.clone(options || {});
 
   var mask;
   if (typeof options.jsonMask === 'string') {
@@ -47,19 +47,29 @@ module.exports = fp.curry(3, function bufferRequest (transport, agent, options) 
   if (options.json)
     buffer = new Buffer(JSON.stringify(options.json));
 
+  var resp = {
+    body: null
+  };
+
   var s = requestStream(transport, agent, reqOptions, buffer);
   return λ(s)
     .through(errorBuffer)
     .through(through.bufferString)
     .through(through.toJson)
     .through(jsonMask(mask))
-    .through(function addResponseHeaders (stream) {
-      return stream.map(function mapHeadersAndBody (body) {
-        return {
-          headers: s.responseHeaders,
-          body: body
-        };
-      });
+    .consume(function buildResp (err, body, push, next) {
+      if (err) {
+        push(err);
+        next();
+      } else if (body === nil) {
+        resp.headers = s.responseHeaders;
+        resp.statusCode = s.statusCode;
+        push(null, resp);
+        push(null, nil);
+      } else {
+        resp.body = body;
+        next();
+      }
     })
     .errors(addRequestInfo(reqOptions));
 });
