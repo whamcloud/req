@@ -11,6 +11,7 @@ describe('request', function () {
 
     req = new PassThrough();
     req.setHeader = jasmine.createSpy('setHeader');
+    req.abort = jasmine.createSpy('abort');
     r = new PassThrough();
     onResponse = fp.noop;
 
@@ -106,6 +107,10 @@ describe('request', function () {
           done();
         })
         .each(fp.noop);
+    });
+
+    it('should pass abort to output stream', function () {
+      expect(s.abort).toEqual(jasmine.any(Function));
     });
 
     describe('passthrough error', function () {

@@ -28,6 +28,7 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
   options.agent = agent;
 
   var s = new PassThrough();
+
   var req = transport.request(options, function handleResponse (r) {
     r.on('error', handleError);
     if (r.statusCode >= 400) {
@@ -40,12 +41,17 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
     s.statusCode = r.statusCode;
     r.pipe(s);
   });
+
   if (buffer) {
     req.setHeader('content-length', buffer.length);
     req.write(buffer);
   }
+
+  s.abort = req.abort.bind(req);
+
   req.on('error', handleError);
   req.end();
+
   return s;
   function handleError (err, keepOpen) {
     s.emit('error', err);

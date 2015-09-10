@@ -52,7 +52,7 @@ module.exports = fp.curry(3, function bufferRequest (transport, agent, options) 
   };
 
   var s = requestStream(transport, agent, reqOptions, buffer);
-  return λ(s)
+  var s2 = λ(s)
     .through(errorBuffer)
     .through(through.bufferString)
     .through(through.toJson)
@@ -72,4 +72,8 @@ module.exports = fp.curry(3, function bufferRequest (transport, agent, options) 
       }
     })
     .errors(addRequestInfo(reqOptions));
+
+  s2.abort = s.abort;
+
+  return s2;
 });

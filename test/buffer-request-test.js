@@ -22,6 +22,7 @@ describe('buffer request', function () {
     requestResult = ['{"result": "result"}'];
 
     rStream = new PassThrough();
+    rStream.abort = 'abort';
     requestStream = jasmine.createSpy('requestStream')
       .and.returnValue(rStream);
 
@@ -106,6 +107,10 @@ describe('buffer request', function () {
 
     beforeEach(function () {
       s = bufferRequest('transport', 'agent', { foo: 'baz' });
+    });
+
+    it('should expose abort on s', function () {
+      expect(s.abort).toBe('abort');
     });
 
     it('should call the errorBuffer', function () {

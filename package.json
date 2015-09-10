@@ -1,6 +1,6 @@
 {
   "name": "@intel-js/req",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "index.js",
   "scripts": {
