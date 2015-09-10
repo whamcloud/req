@@ -51,6 +51,8 @@ module.exports = fp.curry(3, function bufferRequest (transport, agent, options) 
     body: null
   };
 
+  var gotError = false;
+
   var s = requestStream(transport, agent, reqOptions, buffer);
   var s2 = λ(s)
     .through(errorBuffer)
@@ -59,12 +61,17 @@ module.exports = fp.curry(3, function bufferRequest (transport, agent, options) 
     .through(jsonMask(mask))
     .consume(function buildResp (err, body, push, next) {
       if (err) {
+        gotError = true;
         push(err);
         next();
       } else if (body === nil) {
-        resp.headers = s.responseHeaders;
-        resp.statusCode = s.statusCode;
-        push(null, resp);
+
+        if (!gotError) {
+          resp.headers = s.responseHeaders;
+          resp.statusCode = s.statusCode;
+          push(null, resp);
+        }
+
         push(null, nil);
       } else {
         resp.body = body;
