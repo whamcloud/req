@@ -37,6 +37,7 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
     }
 
     s.responseHeaders = r.headers;
+    s.statusCode = r.statusCode;
     r.pipe(s);
   });
   if (buffer) {

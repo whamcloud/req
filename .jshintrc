@@ -2,6 +2,7 @@
   "node": true,
 
   "globals": {
+    "nil": false,
     "window": false,
     "describe": false,
     "beforeEach": false,

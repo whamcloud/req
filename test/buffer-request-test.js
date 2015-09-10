@@ -1,13 +1,18 @@
 'use strict';
+
 var rewire = require('rewire');
 var bufferRequest = rewire('../buffer-request');
 var fp = require('@intel-js/fp');
+var λ = require('highland');
+var PassThrough = require('stream').PassThrough;
 
 describe('buffer request', function () {
-  var options, errorBuffer, λ,
-    requestStream, stream,
-    revert, requestResult, response,
-    addRequestInfo, addRequestInfoStream, buildOptions, opts, mask, through;
+  var revert, options,
+    errorBuffer,
+    requestStream, rStream,
+    requestResult,
+    addRequestInfo, buildOptions, opts, jsonMask,
+    through;
 
   beforeEach(function () {
     options = {
@@ -16,49 +21,42 @@ describe('buffer request', function () {
     opts = {};
     requestResult = ['{"result": "result"}'];
 
-    stream = {
-      through: jasmine.createSpy('through'),
-      errors: jasmine.createSpy('errors')
-    };
+    rStream = new PassThrough();
+    requestStream = jasmine.createSpy('requestStream')
+      .and.returnValue(rStream);
 
-    stream.through.and.callFake(function addResponseHeaders (fn) {
-      if (fn && !fn.and) {
-        var processedStream = {
-          map: jasmine.createSpy('mapHeadersAndBody').and.callFake(function (mapHeadersAndBody) {
-            return mapHeadersAndBody(JSON.parse(requestResult[0]));
-          })
-        };
+    errorBuffer = jasmine.createSpy('errorBuffer')
+      .and.callFake(fp.identity);
 
-        response = fn(processedStream);
-      }
-
-      return stream;
-    });
-
-    stream.errors.and.callFake(fp.always(stream));
-
-    λ = jasmine.createSpy('highland').and.returnValue(stream);
-    requestStream = jasmine.createSpy('requestStream').and.returnValue(requestResult);
-    errorBuffer = jasmine.createSpy('errorBuffer');
     through = {
-      toJson: jasmine.createSpy('toJson'),
+      toJson: jasmine.createSpy('toJson')
+        .and.callFake(fp.identity),
       bufferString: jasmine.createSpy('bufferString')
+        .and.callFake(function (s) {
+          return s.invoke('toString', ['utf8']);
+        })
     };
-    addRequestInfoStream = {};
-    addRequestInfo = jasmine.createSpy('addRequestInfo').and.returnValue(addRequestInfoStream);
-    buildOptions = jasmine.createSpy('buildOptions').and.returnValue(opts);
-    mask = jasmine.createSpy('mask').and.callFake(function () {
-      requestResult.responseHeaders = {header: 'header'};
-    });
+
+    addRequestInfo = jasmine.createSpy('addRequestInfo');
+
+    buildOptions = jasmine.createSpy('buildOptions')
+      .and.callFake(function (obj) {
+        obj.built = 'options';
+        return obj;
+      });
+
+    jsonMask = jasmine.createSpy('jsonMask')
+      .and.callFake(function mask (x, s) {
+        return s;
+      });
 
     revert = bufferRequest.__set__({
-      λ: λ,
       requestStream: requestStream,
       errorBuffer: errorBuffer,
       through: through,
       addRequestInfo: addRequestInfo,
       buildOptions: buildOptions,
-      jsonMask: mask
+      jsonMask: fp.curry(2, jsonMask)
     });
   });
 
@@ -66,75 +64,102 @@ describe('buffer request', function () {
     revert();
   });
 
-  describe('with json', function () {
-    beforeEach(function () {
-      options = {
-        json: { foo: 'bar' },
-        jsonMask: 'p/a,z',
-        path: 'test/path'
-      };
-
-      bufferRequest({}, {}, options);
-    });
-
-    it('should build a buffer from JSON', function () {
-      expect(requestStream.calls.mostRecent().args[3].toString()).toEqual('{"foo":"bar"}');
-    });
-
-    it('should not include the jsonMask in the options', function () {
-      expect(buildOptions).toHaveBeenCalledOnceWith({
-        path: 'test/path',
-        json: { foo: 'bar' }
-      });
-    });
-
-    it('should call jsonMask with the mask', function () {
-      expect(mask).toHaveBeenCalledOnceWith('p/a,z');
-    });
+  it('should be a function', function () {
+    expect(bufferRequest).toEqual(jasmine.any(Function));
   });
 
-  describe('without json', function () {
+  it('should call requestStream with the expected args', function () {
+    bufferRequest('transport', 'agent', { foo: 'baz' });
+
+    expect(requestStream)
+      .toHaveBeenCalledOnceWith('transport', 'agent', {
+        foo: 'baz',
+        built: 'options'
+      }, undefined);
+  });
+
+  it('should call requestStream with a buffer', function () {
+    bufferRequest('transport', 'agent', {
+      jsonMask: 'objects',
+      json: '{}'
+    });
+
+    expect(requestStream)
+      .toHaveBeenCalledOnceWith('transport', 'agent', {
+        json: '{}',
+        built: 'options'
+      }, jasmine.any(Buffer));
+  });
+
+  it('should mask JSON passed in', function () {
+    bufferRequest('transport', 'agent', {
+      jsonMask: 'objects',
+      json: '{}'
+    });
+
+    expect(jsonMask)
+      .toHaveBeenCalledOnceWith('objects', jasmine.any(Object));
+  });
+
+  describe('invoking', function () {
+    var s;
+
     beforeEach(function () {
-      bufferRequest({}, {}, options);
+      s = bufferRequest('transport', 'agent', { foo: 'baz' });
     });
 
-    it('should call buildOptions with path and options', function () {
-      expect(buildOptions).toHaveBeenCalledOnceWith(options);
+    it('should call the errorBuffer', function () {
+      expect(λ.isStream(errorBuffer.calls.mostRecent().args[0])).toBe(true);
     });
 
-    it('should call request with options and buffer', function () {
-      expect(requestStream).toHaveBeenCalledOnceWith({}, {}, opts, undefined);
+    it('should call bufferString', function () {
+      expect(λ.isStream(through.bufferString.calls.mostRecent().args[0])).toBe(true);
     });
 
-    it('should call highland with the result of request', function () {
-      expect(λ).toHaveBeenCalledOnceWith(requestResult);
+    it('should call toJson', function () {
+      expect(λ.isStream(through.toJson.calls.mostRecent().args[0])).toBe(true);
     });
 
-    it('should call through with errorBuffer', function () {
-      expect(stream.through).toHaveBeenCalledOnceWith(errorBuffer);
+    it('should return a response with no body', function (done) {
+      rStream.responseHeaders = {
+        ETag: 1441818174.97
+      };
+      rStream.statusCode = 304;
+      rStream.end();
+
+      s
+        .each(function (x) {
+          expect(x).toEqual({
+            headers: {
+              ETag: 1441818174.97
+            },
+            statusCode: 304,
+            body: null
+          });
+        })
+        .done(done);
     });
 
-    it('should call through with toJson', function () {
-      expect(stream.through).toHaveBeenCalledOnceWith(through.toJson);
-    });
+    it('should return a response with a body', function (done) {
+      rStream.responseHeaders = {
+        'Content-Length': 1
+      };
+      rStream.statusCode = 200;
 
-    it('should call through.bufferString', function () {
-      expect(stream.through).toHaveBeenCalledOnceWith(through.bufferString);
-    });
+      rStream.write('a');
+      rStream.end();
 
-    it('should setup the response to have headers and body properties', function () {
-      expect(response).toEqual({
-        headers: {header: 'header'},
-        body: {result: 'result'}
-      });
-    });
-
-    it('should call addRequestInfo with options', function () {
-      expect(addRequestInfo).toHaveBeenCalledOnceWith(opts);
-    });
-
-    it('should call errors with addRequestInfo', function () {
-      expect(stream.errors).toHaveBeenCalledOnceWith(addRequestInfoStream);
+      s
+        .each(function (x) {
+          expect(x).toEqual({
+            headers: {
+              'Content-Length': 1
+            },
+            statusCode: 200,
+            body: 'a'
+          });
+        })
+        .done(done);
     });
   });
 });

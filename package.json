@@ -1,6 +1,6 @@
 {
   "name": "@intel-js/req",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "index.js",
   "scripts": {
@@ -20,16 +20,16 @@
     "url": "https://github.com/intel-js/req.git"
   },
   "dependencies": {
-    "@intel-js/fp": "1.0.2",
-    "@intel-js/obj": "1.0.2",
-    "@intel-js/through": "1.0.4",
+    "@intel-js/fp": "1.0.7",
+    "@intel-js/obj": "1.0.4",
+    "@intel-js/through": "1.0.7",
     "highland": "2.5.1",
-    "json-mask": "0.3.4"
+    "json-mask": "0.3.5"
   },
   "devDependencies": {
     "jasmine": "2.3.2",
     "jasmine-n-matchers": "2.0.2",
-    "jscs": "2.1.0",
+    "jscs": "2.1.1",
     "jshint": "2.8.0",
     "krusty-jasmine-reporter": "1.0.0",
     "pre-commit": "1.1.1",
