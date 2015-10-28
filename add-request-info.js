@@ -21,7 +21,7 @@
 
 'use strict';
 
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 var format = require('util').format;
 
 module.exports = fp.curry(3, function addRequestInfo (options, err, push) {

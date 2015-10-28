@@ -2,7 +2,7 @@
 
 var λ = require('highland');
 var errorBuffer = require('../error-buffer');
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 
 describe('error buffer', function () {
   it('should pass through non-errors', function () {

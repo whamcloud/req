@@ -21,7 +21,7 @@
 
 'use strict';
 
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 var jsonMask = fp.curry(2, require('json-mask'));
 var format = require('util').format;
 

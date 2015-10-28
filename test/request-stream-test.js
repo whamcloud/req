@@ -3,7 +3,7 @@
 var requestStream = require('../request-stream');
 var PassThrough = require('stream').PassThrough;
 var λ = require('highland');
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 
 describe('request', function () {
   var request, r, s, rs, req, onResponse;

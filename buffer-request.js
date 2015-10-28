@@ -21,15 +21,15 @@
 
 'use strict';
 
-var obj = require('@intel-js/obj');
+var obj = require('intel-obj');
 var λ = require('highland');
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 var requestStream = require('./request-stream');
 var errorBuffer = require('./error-buffer');
 var addRequestInfo = require('./add-request-info');
 var buildOptions = require('./build-options');
 var jsonMask = require('./mask');
-var through = require('@intel-js/through');
+var through = require('intel-through');
 
 module.exports = fp.curry(3, function bufferRequest (transport, agent, options) {
   options = obj.clone(options || {});

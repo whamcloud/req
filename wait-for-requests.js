@@ -21,7 +21,7 @@
 
 'use strict';
 
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 
 module.exports = fp.curry(2, function waitForRequests (agent, done) {
   var x = setInterval(function waitForRequests () {

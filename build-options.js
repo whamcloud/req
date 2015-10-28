@@ -23,7 +23,7 @@
 
 var stringify = require('querystring').stringify;
 var format = require('util').format;
-var obj = require('@intel-js/obj');
+var obj = require('intel-obj');
 
 var defaults = {
   method: 'GET',

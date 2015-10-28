@@ -21,7 +21,7 @@
 
 'use strict';
 
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 var PassThrough = require('stream').PassThrough;
 
 module.exports = fp.curry(4, function requestStream (transport, agent, options, buffer) {

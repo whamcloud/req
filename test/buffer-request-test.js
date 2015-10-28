@@ -2,7 +2,7 @@
 
 var rewire = require('rewire');
 var bufferRequest = rewire('../buffer-request');
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 var λ = require('highland');
 var PassThrough = require('stream').PassThrough;
 

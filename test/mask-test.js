@@ -3,7 +3,7 @@
 var rewire = require('rewire');
 var mask = rewire('../mask');
 var λ = require('highland');
-var fp = require('@intel-js/fp');
+var fp = require('intel-fp');
 
 describe('through', function () {
   var theMask, jsonMask, revert;
