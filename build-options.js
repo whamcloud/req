@@ -30,7 +30,8 @@ var defaults = {
   headers: {
     Connection: 'keep-alive',
     'Transfer-Encoding': 'chunked'
-  }
+  },
+  rejectUnauthorized: false
 };
 
 module.exports = function buildOptions (options) {

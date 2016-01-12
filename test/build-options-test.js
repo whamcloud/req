@@ -39,7 +39,8 @@ describe('build options', function () {
         },
         qs: { foo: 'bar', baz: [ 'qux', 'quux' ] },
         path: '/api/my/test/dir/?foo=bar&baz=qux&baz=quux',
-        json: {}
+        json: {},
+        rejectUnauthorized: false
       });
     });
   });
@@ -61,7 +62,8 @@ describe('build options', function () {
           'Transfer-Encoding': 'chunked'
         },
         qs: { foo: 'bar', baz: [ 'qux', 'quux' ] },
-        path: '/api/my/test/dir/?foo=bar&baz=qux&baz=quux'
+        path: '/api/my/test/dir/?foo=bar&baz=qux&baz=quux',
+        rejectUnauthorized: false
       });
     });
   });
