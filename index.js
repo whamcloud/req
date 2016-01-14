@@ -34,7 +34,8 @@ module.exports = function getReq (transport, agent) {
   var t = transports[transport];
 
   agent = agent || new t.Agent({
-      maxSockets: Infinity // Just for Node 0.10
+      maxSockets: Infinity, // Just for Node 0.10,
+      rejectUnauthorized: false // Just for Node 0.10
   });
 
   return {
