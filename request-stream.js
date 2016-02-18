@@ -43,7 +43,8 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
   });
 
   if (buffer) {
-    req.setHeader('content-length', buffer.length);
+    req.setHeader('Content-Length', buffer.length);
+    req.setHeader('Transfer-Encoding', 'identity');
     req.write(buffer);
   }
 

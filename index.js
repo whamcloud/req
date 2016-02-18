@@ -35,7 +35,8 @@ module.exports = function getReq (transport, agent) {
 
   agent = agent || new t.Agent({
       maxSockets: Infinity, // Just for Node 0.10,
-      rejectUnauthorized: false // Just for Node 0.10
+      rejectUnauthorized: false, // Just for Node 0.10
+      keepAlive: true
   });
 
   return {

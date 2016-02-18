@@ -39,7 +39,7 @@ describe('request', function () {
       λ(req)
         .errors(done.fail)
         .each(function () {
-          expect(req.setHeader).toHaveBeenCalledOnceWith('content-length', buffer.length);
+          expect(req.setHeader).toHaveBeenCalledOnceWith('Content-Length', buffer.length);
 
           done();
         });
