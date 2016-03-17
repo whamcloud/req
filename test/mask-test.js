@@ -2,13 +2,12 @@
 
 var rewire = require('rewire');
 var mask = rewire('../mask');
-var λ = require('highland');
 var fp = require('intel-fp');
 
-describe('through', function () {
-  var theMask, jsonMask, revert;
+describe('masking', function () {
+  var jsonMask, revert;
+
   beforeEach(function () {
-    theMask = 'a/p,z';
     jsonMask = jasmine.createSpy('jsonMask');
 
     revert = mask.__set__({
@@ -21,9 +20,11 @@ describe('through', function () {
   });
 
   describe('with a mask', function () {
-    var streamData, theMask, maskedData, highlandStream;
+    var data, theMask, result,
+      maskedData;
+
     beforeEach(function () {
-      streamData = {
+      data = {
         key: 'value',
         key2: 'value'
       };
@@ -32,74 +33,63 @@ describe('through', function () {
 
       jsonMask.and.returnValue(maskedData);
 
-      highlandStream = λ([streamData])
-        .through(mask(theMask));
+      result = mask(theMask)(data);
     });
 
-    it('should call json-mask with the stream data and the mask', function (done) {
-      highlandStream
-        .each(function () {
-          expect(jsonMask).toHaveBeenCalledOnceWith(streamData, theMask);
-          done();
-        });
+    it('should call json-mask with the stream data and the mask', function () {
+      expect(jsonMask).toHaveBeenCalledOnceWith(data, theMask);
     });
 
-    it('should receive the masked data', function (done) {
-      highlandStream
-        .each(function (data) {
-          expect(data).toEqual(maskedData);
-          done();
-        });
+    it('should receive the masked data', function () {
+      expect(result).toEqual(maskedData);
     });
 
     describe('that returns null', function () {
-      var spy;
+
       beforeEach(function () {
         jsonMask.and.returnValue(null);
-
-        spy = jasmine.createSpy('spy');
-        highlandStream
-          .errors(fp.curry(1, spy))
-          .each(fp.noop);
       });
 
       it('should throw an error', function () {
-          expect(spy).toHaveBeenCalledOnceWith(new Error('The json mask did not match the response and as a\
+        function shouldThrow () {
+          mask(theMask)(data);
+        }
+
+        expect(shouldThrow).toThrow(new Error('The json mask did not match the response and as a\
  result returned null. Examine the mask: "key"'));
       });
 
       it('should have a status code of 400', function () {
-        expect(spy.calls.mostRecent().args[0].statusCode).toEqual(400);
+        var error;
+
+        try {
+          mask(theMask)(data);
+        } catch (e) {
+          error = e;
+        }
+
+        expect(error.statusCode).toBe(400);
       });
     });
   });
 
   describe('without a mask', function () {
-    var streamData, highlandStream;
+    var data, result;
     beforeEach(function () {
-      streamData = {
+      data = {
         key: 'value',
         key2: 'value'
       };
 
-      highlandStream = λ([streamData])
-        .through(mask(undefined));
+      result = mask(undefined)(data);
     });
 
-    it('should return the whole object', function (done) {
-      highlandStream
-        .each(function (data) {
-          expect(data).toEqual(streamData);
-          done();
-        });
+    it('should return the whole object', function () {
+      expect(result).toEqual(data);
     });
 
-    it('should not call json-mask', function (done) {
-      highlandStream
-        .each(function () {
-          expect(jsonMask).not.toHaveBeenCalled();
-          done();
-        });
+    it('should not call json-mask', function () {
+      expect(jsonMask).not.toHaveBeenCalled();
     });
   });
 });

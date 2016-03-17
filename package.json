@@ -1,16 +1,16 @@
 {
   "name": "intel-req",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "index.js",
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine.json NODE_ENV=test jasmine",
-    "jshint": "jshint --c ./.jshintrc --exclude-path ./.jshintignore .",
+    "eslint": "eslint ./",
     "jscs": "jscs ."
   },
   "pre-commit": [
     "jscs",
-    "jshint",
+    "eslint",
     "test"
   ],
   "author": "IML Team",
@@ -23,18 +23,18 @@
     "url": "https://github.intel.com/IML/req.git"
   },
   "dependencies": {
-    "intel-fp": "1.0.15",
-    "intel-obj": "1.0.5",
-    "intel-through": "1.0.7",
-    "highland": "2.5.1",
+    "intel-fp": "4.1.2",
+    "intel-obj": "5.0.2",
+    "intel-through": "1.0.8",
+    "highland": "2.7.1",
     "json-mask": "0.3.5"
   },
   "devDependencies": {
-    "jasmine": "2.3.2",
+    "jasmine": "2.4.1",
     "jasmine-n-matchers": "2.0.2",
-    "jscs": "2.5.1",
-    "jshint": "2.8.0",
-    "krusty-jasmine-reporter": "1.0.0",
+    "jscs": "2.11.0",
+    "eslint": "2.0.0",
+    "intel-jasmine-junit-reporter": "1.0.0",
     "pre-commit": "1.1.2",
     "rewire": "2.5.0"
   }

@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2015 Intel Corporation All Rights Reserved.
+// Copyright 2013-2016 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -26,15 +26,17 @@ var format = require('util').format;
 var obj = require('intel-obj');
 
 var defaults = {
-  method: 'GET',
   headers: {
     Connection: 'keep-alive',
     'Transfer-Encoding': 'chunked'
   },
+  method: 'GET',
   rejectUnauthorized: false
 };
 
 module.exports = function buildOptions (options) {
+  options = obj.merge({}, defaults, options);
+
   options.path = options.path
     .replace(/^\/*/, '/')
     .replace(/\/*$/, '/');
@@ -43,15 +45,5 @@ module.exports = function buildOptions (options) {
   if (queryString)
     options.path = format('%s?%s', options.path, queryString);
 
-  var opts = obj.merge({}, defaults, options);
-
-  if (options.json)
-    obj.merge(opts, {
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        Accept: 'application/json'
-      }
-    });
-
-  return opts;
+  return options;
 };

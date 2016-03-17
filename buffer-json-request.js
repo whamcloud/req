@@ -21,46 +21,52 @@
 
 'use strict';
 
-var λ = require('highland');
+var obj = require('intel-obj');
 var fp = require('intel-fp');
-var requestStream = require('./request-stream');
-var errorBuffer = require('./error-buffer');
-var addRequestInfo = require('./add-request-info');
-var through = require('intel-through');
-var buildOptions = require('./build-options');
+var jsonMask = require('./mask');
+var bufferRequest = require('./buffer-request');
+var format = require('util').format;
 
-module.exports = fp.curry(4, function bufferRequest (transport, agent, options, buffer) {
-  options = buildOptions(options || {});
+module.exports = fp.curry(3, function bufferJsonRequest (transport, agent, options) {
+  options = obj.clone(options || {});
 
-  var resp = {
-    body: null
-  };
+  var mask;
+  if (typeof options.jsonMask === 'string') {
+    mask = options.jsonMask;
+    delete options.jsonMask;
+  }
 
-  var gotError = false;
+  var buffer;
 
-  var s = requestStream(transport, agent, options, buffer);
-  var s2 = λ(s)
-    .through(errorBuffer)
-    .through(through.bufferString)
-    .consume(function buildResp (err, body, push, next) {
-      if (err) {
-        gotError = true;
-        push(err);
-        next();
-      } else if (body === λ.nil) {
-        if (!gotError) {
-          resp.headers = s.responseHeaders;
-          resp.statusCode = s.statusCode;
-          push(null, resp);
-        }
+  if (options.json) {
+    buffer = new Buffer(JSON.stringify(options.json));
 
-        push(null, λ.nil);
-      } else {
-        resp.body = body;
-        next();
+    obj.merge(options, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8'
       }
-    })
-    .errors(addRequestInfo(options));
+    });
+
+    delete options.json;
+  }
+
+  var s = bufferRequest(transport, agent, options, buffer);
+
+  var s2 = s
+    .map(fp.over(
+      fp.lensProp('body'),
+      fp.flow(
+        function convert (x) {
+          try {
+            return JSON.parse(x);
+          } catch (e) {
+            throw new Error(format('Could not parse %s to JSON.', x));
+          }
+        },
+        jsonMask(mask)
+      )
+    ));
 
   s2.abort = s.abort;
 

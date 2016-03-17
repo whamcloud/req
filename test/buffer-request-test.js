@@ -7,20 +7,13 @@ var λ = require('highland');
 var PassThrough = require('stream').PassThrough;
 
 describe('buffer request', function () {
-  var revert, options,
+  var revert,
     errorBuffer,
     requestStream, rStream,
-    requestResult,
-    addRequestInfo, buildOptions, opts, jsonMask,
+    addRequestInfo, buildOptions,
     through;
 
   beforeEach(function () {
-    options = {
-      path: 'test/path'
-    };
-    opts = {};
-    requestResult = ['{"result": "result"}'];
-
     rStream = new PassThrough();
     rStream.abort = 'abort';
     requestStream = jasmine.createSpy('requestStream')
@@ -30,8 +23,6 @@ describe('buffer request', function () {
       .and.callFake(fp.identity);
 
     through = {
-      toJson: jasmine.createSpy('toJson')
-        .and.callFake(fp.identity),
       bufferString: jasmine.createSpy('bufferString')
         .and.callFake(function (s) {
           return s.invoke('toString', ['utf8']);
@@ -46,18 +37,12 @@ describe('buffer request', function () {
         return obj;
       });
 
-    jsonMask = jasmine.createSpy('jsonMask')
-      .and.callFake(function mask (x, s) {
-        return s;
-      });
-
     revert = bufferRequest.__set__({
-      requestStream: requestStream,
-      errorBuffer: errorBuffer,
-      through: through,
       addRequestInfo: addRequestInfo,
       buildOptions: buildOptions,
-      jsonMask: fp.curry(2, jsonMask)
+      errorBuffer: errorBuffer,
+      requestStream: requestStream,
+      through: through
     });
   });
 
@@ -70,43 +55,32 @@ describe('buffer request', function () {
   });
 
   it('should call requestStream with the expected args', function () {
-    bufferRequest('transport', 'agent', { foo: 'baz' });
+    bufferRequest('transport', 'agent', { foo: 'baz' }, null);
 
     expect(requestStream)
       .toHaveBeenCalledOnceWith('transport', 'agent', {
-        foo: 'baz',
-        built: 'options'
-      }, undefined);
+        built: 'options',
+        foo: 'baz'
+      }, null);
   });
 
   it('should call requestStream with a buffer', function () {
     bufferRequest('transport', 'agent', {
-      jsonMask: 'objects',
-      json: '{}'
-    });
+      foo: 'bar'
+    }, new Buffer('abc'));
 
     expect(requestStream)
       .toHaveBeenCalledOnceWith('transport', 'agent', {
-        json: '{}',
-        built: 'options'
+        built: 'options',
+        foo: 'bar'
       }, jasmine.any(Buffer));
-  });
-
-  it('should mask JSON passed in', function () {
-    bufferRequest('transport', 'agent', {
-      jsonMask: 'objects',
-      json: '{}'
-    });
-
-    expect(jsonMask)
-      .toHaveBeenCalledOnceWith('objects', jasmine.any(Object));
   });
 
   describe('invoking', function () {
     var s;
 
     beforeEach(function () {
-      s = bufferRequest('transport', 'agent', { foo: 'baz' });
+      s = bufferRequest('transport', 'agent', { foo: 'baz' }, null);
     });
 
     it('should expose abort on s', function () {
@@ -121,10 +95,6 @@ describe('buffer request', function () {
       expect(λ.isStream(through.bufferString.calls.mostRecent().args[0])).toBe(true);
     });
 
-    it('should call toJson', function () {
-      expect(λ.isStream(through.toJson.calls.mostRecent().args[0])).toBe(true);
-    });
-
     it('should return a response with no body', function (done) {
       rStream.responseHeaders = {
         ETag: 1441818174.97
@@ -135,11 +105,11 @@ describe('buffer request', function () {
       s
         .each(function (x) {
           expect(x).toEqual({
+            body: null,
             headers: {
               ETag: 1441818174.97
             },
-            statusCode: 304,
-            body: null
+            statusCode: 304
           });
         })
         .done(done);
@@ -157,11 +127,11 @@ describe('buffer request', function () {
       s
         .each(function (x) {
           expect(x).toEqual({
+            body: 'a',
             headers: {
               'Content-Length': 1
             },
-            statusCode: 200,
-            body: 'a'
+            statusCode: 200
           });
         })
         .done(done);

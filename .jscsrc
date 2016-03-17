@@ -76,20 +76,12 @@
   ],
   "validateLineBreaks": "LF",
   "validateQuoteMarks": "'",
+  "validateOrderInObjectKeys": true,
   "validateParameterSeparator": ", ",
   "disallowMixedSpacesAndTabs": true,
   "requireLineFeedAtFileEnd": true,
   "maximumLineLength": 120,
   "requireCapitalizedConstructors": true,
-  "jsDoc": {
-    "checkAnnotations": "jsdoc3",
-    "checkParamNames": true,
-    "checkRedundantParams": true,
-    "checkReturnTypes": true,
-    "checkRedundantReturns": true,
-    "checkTypes": true,
-    "requireParamTypes": true
-  },
   "excludeFiles": [
     "node_modules/**"
   ]

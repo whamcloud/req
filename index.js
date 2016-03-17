@@ -1,7 +1,7 @@
 //
 // INTEL CONFIDENTIAL
 //
-// Copyright 2013-2015 Intel Corporation All Rights Reserved.
+// Copyright 2013-2016 Intel Corporation All Rights Reserved.
 //
 // The source code contained or described herein and all documents related
 // to the source code ("Material") are owned by Intel Corporation or its
@@ -23,6 +23,7 @@
 
 var bufferRequest = require('./buffer-request');
 var waitForRequests = require('./wait-for-requests');
+var bufferJsonRequest = require('./buffer-json-request');
 
 var transports = {
   http: require('http'),
@@ -34,12 +35,13 @@ module.exports = function getReq (transport, agent) {
   var t = transports[transport];
 
   agent = agent || new t.Agent({
-      maxSockets: Infinity, // Just for Node 0.10,
-      rejectUnauthorized: false, // Just for Node 0.10
-      keepAlive: true
+    keepAlive: true,
+    maxSockets: Infinity, // Just for Node 0.10,
+    rejectUnauthorized: false // Just for Node 0.10
   });
 
   return {
+    bufferJsonRequest: bufferJsonRequest(t, agent),
     bufferRequest: bufferRequest(t, agent),
     waitForRequests: waitForRequests(agent)
   };
