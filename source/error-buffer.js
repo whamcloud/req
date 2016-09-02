@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,50 +21,33 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import highland from 'highland';
+import type { HighlandStreamT } from 'highland';
 
-var λ = require('highland');
-var fp = require('intel-fp');
-var requestStream = require('./request-stream');
-var errorBuffer = require('./error-buffer');
-var addRequestInfo = require('./add-request-info');
-var through = require('intel-through');
-var buildOptions = require('./build-options');
+export default (s: HighlandStreamT<Buffer>) => {
+  let incomingErr;
 
-module.exports = fp.curry(4, function bufferRequest (transport, agent, options, buffer) {
-  options = buildOptions(options || {});
+  return s.consume((err, chunk, push, next) => {
+    if (chunk === highland.nil) return handleNil(chunk, push);
+    else if (err) handleErr(err, push);
+    else handleChunks(chunk, push);
 
-  var resp = {
-    body: null
-  };
+    next();
+  });
 
-  var gotError = false;
+  function handleErr(err, push) {
+    if (!err.statusCode) push(err);
+    else incomingErr = err;
+  }
 
-  var s = requestStream(transport, agent, options, buffer);
-  var s2 = λ(s)
-    .through(errorBuffer)
-    .through(through.bufferString)
-    .consume(function buildResp (err, body, push, next) {
-      if (err) {
-        gotError = true;
-        push(err);
-        next();
-      } else if (body === λ.nil) {
-        if (!gotError) {
-          resp.headers = s.responseHeaders;
-          resp.statusCode = s.statusCode;
-          push(null, resp);
-        }
+  function handleNil(chunk, push) {
+    if (incomingErr) push(incomingErr);
 
-        push(null, λ.nil);
-      } else {
-        resp.body = body;
-        next();
-      }
-    })
-    .errors(addRequestInfo(options));
+    push(null, chunk);
+  }
 
-  s2.abort = s.abort;
-
-  return s2;
-});
+  function handleChunks(chunk, push) {
+    if (incomingErr) incomingErr.message += chunk.toString('utf-8');
+    else push(null, chunk);
+  }
+};

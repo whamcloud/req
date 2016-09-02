@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,29 +21,13 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import type { Agent } from 'http';
 
-var fp = require('intel-fp');
-var jsonMask = fp.curry(2, require('json-mask'));
-var format = require('util').format;
+export default (agent: Agent) => (done: () => void) => {
+  const x = setInterval(() => {
+    if (Object.keys(agent.sockets).length) return;
 
-module.exports = function toJson (mask) {
-  if (!mask)
-    return fp.identity;
-
-  return fp.flow(
-    jsonMask(fp.__, mask),
-    function handle (response) {
-      if (response !== null)
-        return response;
-
-      var msg = format('The json mask did not match the response and as a result returned null. Examine \
-the mask: "%s"', mask);
-
-      var err = new Error(msg);
-      err.statusCode = 400;
-
-      throw err;
-    }
-  );
+    clearInterval(x);
+    done();
+  }, 10);
 };

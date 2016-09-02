@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,23 +21,39 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import { PassThrough } from 'stream';
+import ResponseError from './response-error.js';
 
-var fp = require('intel-fp');
-var PassThrough = require('stream').PassThrough;
+import type { TransportModules } from './index.js';
+import type { Agent } from 'http';
+import type { Options } from './build-options.js';
 
-module.exports = fp.curry(4, function requestStream (transport, agent, options, buffer) {
-  options.agent = agent;
+class RequestStream extends PassThrough {
+  constructor(opts?: Object) {
+    super(opts);
+  }
+  responseHeaders: {
+    [key: string]: string
+  };
+  statusCode: number;
+  abort: () => void;
+}
 
-  var s = new PassThrough();
+export default (transport: TransportModules, agent: Agent) => (
+  options: Options,
+  buffer?: Buffer
+) => {
+  const requestOptions = {
+    ...options,
+    agent
+  };
 
-  var req = transport.request(options, function handleResponse (r) {
+  const s = new RequestStream();
+
+  const req = transport.request(requestOptions, r => {
     r.on('error', handleError);
-    if (r.statusCode >= 400) {
-      var err = new Error();
-      err.statusCode = r.statusCode;
-      handleError(err, true);
-    }
+
+    if (r.statusCode >= 400) handleError(new ResponseError(r.statusCode), true);
 
     s.responseHeaders = r.headers;
     s.statusCode = r.statusCode;
@@ -43,7 +61,7 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
   });
 
   if (buffer) {
-    req.setHeader('Content-Length', buffer.length);
+    req.setHeader('Content-Length', buffer.length.toString());
     req.setHeader('Transfer-Encoding', 'identity');
     req.write(buffer);
   }
@@ -54,9 +72,9 @@ module.exports = fp.curry(4, function requestStream (transport, agent, options, 
   req.end();
 
   return s;
-  function handleError (err, keepOpen) {
+
+  function handleError(err, keepOpen) {
     s.emit('error', err);
-    if (!keepOpen)
-      s.end();
+    if (!keepOpen) s.end();
   }
-});
+};

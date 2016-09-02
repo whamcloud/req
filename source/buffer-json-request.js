@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,56 +21,71 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import jsonMask from './mask.js';
+import bufferRequest from './buffer-request.js';
 
-var obj = require('intel-obj');
-var fp = require('intel-fp');
-var jsonMask = require('./mask');
-var bufferRequest = require('./buffer-request');
-var format = require('util').format;
+import type { Agent } from 'http';
+import type { Response, AbortStream } from './buffer-request.js';
+import type { InputOptions } from './build-options.js';
+import type { TransportModules } from './index.js';
 
-module.exports = fp.curry(3, function bufferJsonRequest (transport, agent, options) {
-  options = obj.clone(options || {});
+type JsonResponse = {
+  ...$Exact<Response>,
+  +body: Object
+};
 
-  var mask;
-  if (typeof options.jsonMask === 'string') {
-    mask = options.jsonMask;
-    delete options.jsonMask;
+export default (transport: TransportModules, agent: Agent) => (
+  options: InputOptions
+) => {
+  let opts = {
+    ...options
+  };
+
+  let mask;
+  if (typeof opts.jsonMask === 'string') {
+    mask = opts.jsonMask;
+    delete opts.jsonMask;
   }
 
-  var buffer;
+  let buffer;
 
   if (options.json) {
     buffer = new Buffer(JSON.stringify(options.json));
 
-    obj.merge(options, {
+    opts = {
+      ...opts,
       headers: {
+        ...(opts.headers || {}),
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=UTF-8'
       }
-    });
+    };
 
-    delete options.json;
+    delete opts.json;
   }
 
-  var s = bufferRequest(transport, agent, options, buffer);
+  const s: AbortStream<Response> = bufferRequest(transport, agent)(
+    opts,
+    buffer
+  );
 
-  var s2 = s
-    .map(fp.over(
-      fp.lensProp('body'),
-      fp.flow(
-        function convert (x) {
-          try {
-            return JSON.parse(x);
-          } catch (e) {
-            throw new Error(format('Could not parse %s to JSON.', x));
-          }
-        },
-        jsonMask(mask)
-      )
-    ));
+  const s2 = s.map((x: Response): JsonResponse => {
+    const masker = jsonMask(mask);
+    try {
+      const body: Object = masker(JSON.parse(x.body));
 
+      return ({
+        headers: x.headers,
+        statusCode: x.statusCode,
+        body
+      }: JsonResponse);
+    } catch (e) {
+      throw new Error(`Could not parse ${x.body} to JSON.`);
+    }
+  });
+
+  // $FlowFixMe Monkey patch highland type.
   s2.abort = s.abort;
 
-  return s2;
-});
+  return ((s2: any): AbortStream<JsonResponse>);
+};

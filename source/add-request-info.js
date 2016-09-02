@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,43 +21,10 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import type { Options } from './build-options.js';
 
-var λ = require('highland');
+export default (options: Options) => (error: Error, push: Error => void) => {
+  error.message = `${error.message} From ${options.method} request to ${options.path}`;
 
-module.exports = function errorBuffer (s) {
-  var incomingErr;
-
-  return s
-    .consume(function bufferStatusErrors (err, chunk, push, next) {
-      if (chunk === λ.nil)
-        return handleNil(chunk, push);
-      else if (err)
-        handleErr(err, push, next);
-      else
-        handleChunks(chunk, push, next);
-
-      next();
-    });
-
-  function handleErr (err, push) {
-    if (!err.statusCode)
-      push(err);
-    else
-      incomingErr = err;
-  }
-
-  function handleNil (chunk, push) {
-    if (incomingErr)
-      push(incomingErr);
-
-    push(null, chunk);
-  }
-
-  function handleChunks (chunk, push) {
-    if (incomingErr)
-      incomingErr.message += chunk;
-    else
-      push(null, chunk);
-  }
+  push(error);
 };
