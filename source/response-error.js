@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,16 +21,11 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+export default class ResponseError extends Error {
+  constructor(code: number, message?: string) {
+    super(message);
 
-var fp = require('intel-fp');
-
-module.exports = fp.curry(2, function waitForRequests (agent, done) {
-  var x = setInterval(function waitForRequests () {
-    if (Object.keys(agent.sockets).length)
-      return;
-
-    clearInterval(x);
-    done();
-  }, 10);
-});
+    this.statusCode = code;
+  }
+  statusCode: number;
+}

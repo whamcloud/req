@@ -2,40 +2,59 @@
   "name": "@mfl/req",
   "version": "2.0.0",
   "description": "A module used to make a request and apply a json mask if necessary.",
-  "main": "index.js",
-  "scripts": {
-    "test": "JASMINE_CONFIG_PATH=jasmine.json NODE_ENV=test jasmine",
-    "eslint": "eslint ./",
-    "jscs": "jscs ."
-  },
-  "pre-commit": [
-    "jscs",
-    "eslint",
-    "test"
-  ],
+  "main": "source/index.js",
   "author": "MFL Team",
-  "license": "MIT",
+  "scripts": {
+    "eslint": "eslint ./",
+    "test": "jest",
+    "cover": "NODE_ENV=test yarn test -- --coverage",
+    "flow": "flow"
+  },
   "publishConfig": {
     "access": "public"
   },
+  "pre-commit": [
+    "flow",
+    "eslint",
+    "test"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.intel.com/MFL/req.git"
+    "url": "https://github.com/intel-hpdd/req.git"
   },
+  "jest": {
+    "resetMocks": true,
+    "resetModules": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@mfl)/"
+    ]
+  },
+  "license": "MIT",
   "dependencies": {
-    "@mfl/fp": "4.1.2",
-    "@mfl/obj": "5.0.2",
-    "@mfl/through": "1.0.8",
-    "highland": "2.7.1",
-    "json-mask": "0.3.5"
+    "@mfl/fp": "8.0.0",
+    "highland": "3.0.0-beta.2",
+    "json-mask": "0.3.8"
   },
   "devDependencies": {
-    "jasmine": "2.4.1",
-    "jasmine-n-matchers": "2.0.2",
-    "jscs": "2.11.0",
-    "eslint": "2.0.0",
-    "@mfl/jasmine-junit-reporter": "1.0.0",
-    "pre-commit": "1.1.2",
-    "rewire": "2.5.0"
+    "@mfl/flow-highland": "4.0.0",
+    "@mfl/flow-jasmine": "1.6.0",
+    "@mfl/jasmine-n-matchers": "2.1.1",
+    "babel-eslint": "7.2.3",
+    "babel-plugin-transform-flow-strip-types": "6.22.0",
+    "babel-plugin-transform-object-rest-spread": "6.23.0",
+    "babel-preset-env": "^1.1.9",
+    "eslint": "^3.16.1",
+    "eslint-config-prettier": "1.7.0",
+    "eslint-plugin-flowtype": "2.32.1",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-prettier": "2.0.1",
+    "flow-bin": "0.44.2",
+    "jest": "^19.0.2",
+    "pre-commit": "1.2.2",
+    "prettier": "1.2.2"
   }
 }

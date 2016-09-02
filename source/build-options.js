@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,31 +21,52 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import { stringify } from 'querystring';
 
-var stringify = require('querystring').stringify;
-var format = require('util').format;
-var obj = require('intel-obj');
-
-var defaults = {
-  headers: {
-    Connection: 'keep-alive',
-    'Transfer-Encoding': 'chunked'
+export type InputOptions = {
+  path: string,
+  method?: string,
+  rejectUnauthorized?: boolean,
+  headers?: {
+    [key: string]: string
   },
-  method: 'GET',
-  rejectUnauthorized: false
+  jsonMask?: string,
+  json?: Object,
+  qs?: Object
 };
 
-module.exports = function buildOptions (options) {
-  options = obj.merge({}, defaults, options);
+export type Options = {
+  ...$Exact<InputOptions>,
+  +method: string,
+  +rejectUnauthorized: boolean,
+  +headers: {
+    [key: string]: string
+  }
+};
 
-  options.path = options.path
-    .replace(/^\/*/, '/')
-    .replace(/\/*$/, '/');
+export default ({
+  method = 'GET',
+  rejectUnauthorized = false,
+  headers = {},
+  ...rest
+}: InputOptions) => {
+  const options = {
+    method,
+    rejectUnauthorized,
+    headers: {
+      Connection: 'keep-alive',
+      'Transfer-Encoding': 'chunked',
+      ...headers
+    },
+    ...rest
+  };
 
-  var queryString = stringify(options.qs);
-  if (queryString)
-    options.path = format('%s?%s', options.path, queryString);
+  options.path = options.path.replace(/^\/*/, '/').replace(/\/*$/, '/');
+
+  if (rest.qs) {
+    const queryString = stringify(rest.qs);
+    options.path = `${options.path}?${queryString}`;
+  }
 
   return options;
 };

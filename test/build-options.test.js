@@ -1,11 +1,11 @@
-'use strict';
+import buildOptions from '../source/build-options.js';
 
-var buildOptions = require('../build-options');
+import { describe, beforeEach, it, expect } from './jasmine.js';
 
-describe('build options', function () {
-  var opts, result;
+describe('build options', () => {
+  let opts, result;
 
-  beforeEach(function () {
+  beforeEach(() => {
     opts = {
       headers: {},
       host: 'localhost:8000',
@@ -22,7 +22,7 @@ describe('build options', function () {
     result = buildOptions(opts);
   });
 
-  it('should give appropriate results', function () {
+  it('should give appropriate results', () => {
     expect(result).toEqual({
       headers: {
         Connection: 'keep-alive',
@@ -34,7 +34,7 @@ describe('build options', function () {
       path: '/api/my/test/dir/?baz=qux&baz=quux&foo=bar',
       port: '8000',
       qs: {
-        baz: [ 'qux', 'quux' ],
+        baz: ['qux', 'quux'],
         foo: 'bar'
       },
       rejectUnauthorized: false

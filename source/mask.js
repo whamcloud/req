@@ -1,3 +1,5 @@
+// @flow
+
 //
 // INTEL CONFIDENTIAL
 //
@@ -19,30 +21,21 @@
 // otherwise. Any license under such intellectual property rights must be
 // express and approved by Intel in writing.
 
-'use strict';
+import jsonMask from 'json-mask';
+import ResponseError from './response-error.js';
 
-var bufferRequest = require('./buffer-request');
-var waitForRequests = require('./wait-for-requests');
-var bufferJsonRequest = require('./buffer-json-request');
+export default (mask: ?string) => {
+  if (!mask) return (x: Object) => x;
 
-var transports = {
-  http: require('http'),
-  https: require('https')
-};
+  return (x: Object) => {
+    const response: Object = jsonMask(x, mask);
 
-module.exports = function getReq (transport, agent) {
-  transport = transport || 'https';
-  var t = transports[transport];
+    if (response !== null) return response;
 
-  agent = agent || new t.Agent({
-    keepAlive: true,
-    maxSockets: Infinity, // Just for Node 0.10,
-    rejectUnauthorized: false // Just for Node 0.10
-  });
-
-  return {
-    bufferJsonRequest: bufferJsonRequest(t, agent),
-    bufferRequest: bufferRequest(t, agent),
-    waitForRequests: waitForRequests(agent)
+    throw new ResponseError(
+      400,
+      // $FlowFixMe there is nowhere in closure scope mask is being set to null.
+      `The json mask did not match the response and as a result returned null. Examine the mask: "${mask}"`
+    );
   };
 };
