@@ -1,5 +1,5 @@
 {
-  "name": "intel-req",
+  "name": "@mfl/req",
   "version": "2.0.0",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "index.js",
@@ -13,19 +13,19 @@
     "eslint",
     "test"
   ],
-  "author": "IML Team",
+  "author": "MFL Team",
   "license": "MIT",
   "publishConfig": {
-    "registry": "https://ubit-artifactory-or.intel.com/artifactory/api/npm/iml-npm-local"
+    "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.intel.com/IML/req.git"
+    "url": "https://github.intel.com/MFL/req.git"
   },
   "dependencies": {
-    "intel-fp": "4.1.2",
-    "intel-obj": "5.0.2",
-    "intel-through": "1.0.8",
+    "@mfl/fp": "4.1.2",
+    "@mfl/obj": "5.0.2",
+    "@mfl/through": "1.0.8",
     "highland": "2.7.1",
     "json-mask": "0.3.5"
   },
@@ -34,7 +34,7 @@
     "jasmine-n-matchers": "2.0.2",
     "jscs": "2.11.0",
     "eslint": "2.0.0",
-    "intel-jasmine-junit-reporter": "1.0.0",
+    "@mfl/jasmine-junit-reporter": "1.0.0",
     "pre-commit": "1.1.2",
     "rewire": "2.5.0"
   }
