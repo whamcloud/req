@@ -40,8 +40,8 @@
     "json-mask": "0.3.8"
   },
   "devDependencies": {
-    "@mfl/flow-highland": "4.0.0",
-    "@mfl/flow-jasmine": "1.6.0",
+    "@mfl/flow-highland": "4.1.0",
+    "@mfl/flow-jasmine": "1.6.1",
     "@mfl/jasmine-n-matchers": "2.1.1",
     "babel-eslint": "7.2.3",
     "babel-plugin-transform-flow-strip-types": "6.22.0",

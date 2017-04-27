@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@mfl/flow-highland@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@mfl/flow-highland/-/flow-highland-4.0.0.tgz#a698ec14ada611ca5c8b8550147df695582122e8"
+"@mfl/flow-highland@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@mfl/flow-highland/-/flow-highland-4.1.0.tgz#86856f6f34cc06fa31be21124151c3768522de4d"
 
-"@mfl/flow-jasmine@1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@mfl/flow-jasmine/-/flow-jasmine-1.6.0.tgz#87816f153ccf6177f978e4094685a56aeeeb3221"
+"@mfl/flow-jasmine@1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@mfl/flow-jasmine/-/flow-jasmine-1.6.1.tgz#ddf955193823af50f2180fc613e81cf7fbde2043"
 
 "@mfl/fp@8.0.0":
   version "8.0.0"
@@ -1250,10 +1250,6 @@ exit-hook@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/exit-hook/-/exit-hook-1.1.1.tgz#f05ca233b48c05d54fff07765df8507e95c02ff8"
 
-exit@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/exit/-/exit-0.1.2.tgz#0632638f8d877cc82107d30a0fff1a17cba1cd0c"
-
 expand-brackets@^0.1.4:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/expand-brackets/-/expand-brackets-0.1.5.tgz#df07284e342a807cd733ac5af72411e581d1177b"
@@ -1428,7 +1424,7 @@ glob-parent@^2.0.0:
   dependencies:
     is-glob "^2.0.0"
 
-glob@7.1.1, glob@^7.0.0, glob@^7.0.3, glob@^7.0.5, glob@^7.0.6:
+glob@7.1.1, glob@^7.0.0, glob@^7.0.3, glob@^7.0.5:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.1.tgz#805211df04faaf1c63a3600306cdf5ade50b2ec8"
   dependencies:
@@ -1792,18 +1788,6 @@ istanbul-reports@^1.0.2:
   resolved "https://registry.yarnpkg.com/istanbul-reports/-/istanbul-reports-1.0.2.tgz#4e8366abe6fa746cc1cd6633f108de12cc6ac6fa"
   dependencies:
     handlebars "^4.0.3"
-
-jasmine-core@~2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.6.0.tgz#95e80740cc4d2c16741750e8b79e53c7ee15056a"
-
-jasmine@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-2.6.0.tgz#6b22e70883e8e589d456346153b4d206ddbe217f"
-  dependencies:
-    exit "^0.1.2"
-    glob "^7.0.6"
-    jasmine-core "~2.6.0"
 
 jest-changed-files@^19.0.2:
   version "19.0.2"
