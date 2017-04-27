@@ -7,7 +7,4 @@ node_modules
 .gitignore
 *.log
 /test
-/source
 /coverage
-/bin
-run_test.sh
