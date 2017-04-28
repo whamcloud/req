@@ -35,12 +35,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@mfl/flow-highland": "^4.2.0",
     "@mfl/fp": "8.0.0",
     "highland": "3.0.0-beta.4",
     "json-mask": "0.3.8"
   },
   "devDependencies": {
-    "@mfl/flow-highland": "4.2.0",
     "@mfl/flow-jasmine": "1.6.1",
     "@mfl/jasmine-n-matchers": "2.1.1",
     "babel-eslint": "7.2.3",
