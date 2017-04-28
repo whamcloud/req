@@ -37,7 +37,8 @@ import type { InputOptions } from './build-options.js';
 export type Response = {
   body: string,
   +headers: {
-    [key: string]: string
+    [key: string]: string,
+    'set-cookie': string[]
   },
   +statusCode: number
 };
