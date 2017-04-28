@@ -29,6 +29,9 @@ import bufferJsonRequest from './buffer-json-request.js';
 
 import type { Agent } from 'http';
 
+export type { InputOptions, Options } from './build-options.js';
+export type { JsonResponse } from './buffer-json-request.js';
+
 export type Transports = 'http' | 'https';
 
 export type TransportModules = typeof https | typeof http;

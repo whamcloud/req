@@ -29,7 +29,7 @@ import type { Response, AbortStream } from './buffer-request.js';
 import type { InputOptions } from './build-options.js';
 import type { TransportModules } from './index.js';
 
-type JsonResponse = {
+export type JsonResponse = {
   ...$Exact<Response>,
   +body: Object
 };
