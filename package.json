@@ -35,8 +35,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@mfl/flow-highland": "^4.2.0",
-    "@mfl/fp": "8.0.0",
+    "@mfl/flow-highland": "4.2.3",
+    "@mfl/fp": "8.0.1",
     "highland": "3.0.0-beta.4",
     "json-mask": "0.3.8"
   },
