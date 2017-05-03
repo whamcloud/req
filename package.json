@@ -1,6 +1,6 @@
 {
   "name": "@mfl/req",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "source/index.js",
   "author": "MFL Team",
