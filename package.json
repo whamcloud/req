@@ -1,6 +1,6 @@
 {
   "name": "@mfl/req",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "source/index.js",
   "author": "MFL Team",
@@ -35,7 +35,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@mfl/flow-highland": "^4.2.0",
+    "@mfl/flow-highland": "4.2.3",
     "@mfl/fp": "8.0.1",
     "highland": "3.0.0-beta.4",
     "json-mask": "0.3.8"
