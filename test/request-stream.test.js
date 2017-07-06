@@ -3,7 +3,7 @@ import requestStream from '../source/request-stream.js';
 
 import { PassThrough } from 'stream';
 
-import { flow } from '@mfl/fp';
+import { flow } from '@iml/fp';
 import { describe, beforeEach, it, jasmine, expect } from './jasmine.js';
 
 describe('request', () => {
