@@ -1,9 +1,9 @@
 {
-  "name": "@mfl/req",
+  "name": "@iml/req",
   "version": "3.0.4",
   "description": "A module used to make a request and apply a json mask if necessary.",
   "main": "source/index.js",
-  "author": "MFL Team",
+  "author": "IML Team",
   "scripts": {
     "eslint": "eslint ./",
     "test": "jest",
@@ -30,27 +30,27 @@
       "/test"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!@mfl)/"
+      "/node_modules/(?!@iml)/"
     ]
   },
   "license": "MIT",
   "dependencies": {
-    "@mfl/flow-highland": "4.2.7",
-    "@mfl/fp": "8.0.1",
+    "@iml/flow-highland": "4.2.8",
+    "@iml/fp": "8.0.3",
     "highland": "3.0.0-beta.4",
     "json-mask": "0.3.8"
   },
   "devDependencies": {
-    "@mfl/flow-jasmine": "1.6.1",
-    "@mfl/jasmine-n-matchers": "2.1.1",
+    "@iml/flow-jasmine": "1.6.1",
+    "@iml/jasmine-n-matchers": "2.1.1",
     "babel-eslint": "7.2.3",
     "babel-plugin-transform-flow-strip-types": "6.22.0",
-    "babel-plugin-transform-object-rest-spread": "6.23.0",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "^1.1.9",
     "eslint": "^3.16.1",
-    "eslint-config-prettier": "2.2.0",
+    "eslint-config-prettier": "2.3.0",
     "eslint-plugin-flowtype": "2.32.1",
-    "eslint-plugin-import": "2.5.0",
+    "eslint-plugin-import": "2.6.0",
     "eslint-plugin-prettier": "2.0.1",
     "flow-bin": "0.46.0",
     "jest": "^19.0.2",
