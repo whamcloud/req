@@ -35,7 +35,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@iml/flow-highland": "4.2.8",
+    "@iml/flow-highland": "4.3.0",
     "@iml/fp": "8.0.3",
     "highland": "3.0.0-beta.4",
     "json-mask": "0.3.8"
